@@ -1,5 +1,3 @@
-const { response } = require('express');
-
 // create variable to hold db connection
 let db;
 // establish a connection to IndexedDB database called 'pizza_hunt' set it to version 1
@@ -15,10 +13,10 @@ request.onupgradeneeded = function (event) {
 
 // upon a successful
 request.onsuccess = function (event) {
-  // when db is successfully created with its object store (from onupgradedneeded event above) or simply established a connection, save reference to db is global variable
+  // when db is successfully created with its object store (from onupgradedneeded event above), save reference to db in global variable
   db = event.target.result;
 
-  // check if app is online, if yes run uploadPizza() function to send all local db data to api
+  // check if app is online, if yes run checkDatabase() function to send all local db data to api
   if (navigator.onLine) {
     // we haven't created this yet, but we will soon, so let's commet it out for now
     uploadPizza();
@@ -38,15 +36,15 @@ function saveRecord(record) {
   // access the object store for `new_pizza`
   const pizzaObjectStore = transaction.objectStore('new_pizza');
 
-  // add record to your store with add method
+  // add record to your store with add method.
   pizzaObjectStore.add(record);
 }
 
 function uploadPizza() {
-  // open a transaction on your db
+  // open a transaction on your pending db
   const transaction = db.transaction(['new_pizza'], 'readwrite');
 
-  // access your object store
+  // access your pending object store
   const pizzaObjectStore = transaction.objectStore('new_pizza');
 
   // get all records from store and set to a variable
@@ -75,10 +73,9 @@ function uploadPizza() {
           const pizzaObjectStore = transaction.objectStore('new_pizza');
           // clear all items in your store
           pizzaObjectStore.clear();
-
-          alert('All saved pizza has been submitted!');
         })
         .catch((err) => {
+          // set reference to redirect back here
           console.log(err);
         });
     }
